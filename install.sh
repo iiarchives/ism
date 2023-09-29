@@ -53,13 +53,13 @@ base_install() {
 }
 clean() {
     cd && rm -rf /tmp/ism
+    clear
 }
 install_client() {
     init_setup
     base_install client
     echo "Cleaning up ..."
     clean
-    printf "\n\n\n"
     echo "ISM client installed!"
     echo "Now, edit /lib/systemd/system/ism_client.service and add in your configuration details."
     echo "Afterwards, the client can be started with 'systemctl start ism_client'!"
@@ -76,13 +76,12 @@ install_server() {
     ./mkcert -key-file /opt/ism/server/cert/key.pem -cert-file /opt/ism/server/cert/cert.pem $LOCAL_IP
     echo "Cleaning up ..."
     clean
-    printf "\n\n\n"
-    echo "ISM client installed!"
-    echo "Now, edit /lib/systemd/system/ism_client.service and add in your configuration details."
-    echo "Afterwards, the client can be started with 'systemctl start ism_client'!"
+    echo "ISM server installed!"
+    echo "Now, edit /lib/systemd/system/ism_server.service and add in your configuration details."
+    echo "Afterwards, the server can be started with 'systemctl start ism_server'!"
 }
 uninstall() {
-    echo "Uninstalling ISM ..."
+    echo "Uninstalling ISM (ignore any errors) ..."
 
     # Remove systemd units
     systemctl stop ism_server

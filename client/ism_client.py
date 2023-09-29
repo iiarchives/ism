@@ -2,19 +2,22 @@
 
 # Modules
 import logging
-from time import sleep
+from time import time, sleep
+from socket import gethostname
 from argparse import ArgumentParser
+from urllib3.exceptions import InsecureRequestWarning
 
 import psutil
-from requests import Session
+import requests
 
 # Initialization
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 logging.basicConfig(
     format = "[%(levelname)s] %(message)s",
-    level = logging.DEBUG
+    level = logging.INFO
 )
+requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning)
 
 # Conversions
 gb_divisor = 1_000_000_000
@@ -23,7 +26,7 @@ gb_divisor = 1_000_000_000
 def ism_mainloop(args) -> None:
     logging.info(f"ISM Client v{__version__}")
     logging.info(f"Upstream: {args.server} | Token: {args.token}")
-    with Session() as session:
+    with requests.Session() as session:
         while True:
 
             # Start logging metrics
@@ -34,13 +37,16 @@ def ism_mainloop(args) -> None:
                     "total": round(memory_info[0] / gb_divisor, 1),
                     "used": round(memory_info[3] / gb_divisor, 1),
                     "percentage": round((memory_info[3] / memory_info[0]) * 100, 1)
-                }
+                },
+                "time": round(time()),
+                "token": args.token,
+                "hostname": args.hostname
             }
 
             # Send off to remote upstream
             try:
                 resp = session.post(
-                    f"https://{args.server}/upload",
+                    f"https://{args.server}/api/upload",
                     json = metrics,
                     verify = False  # Most people won't have a certificate for this
                 )
@@ -75,5 +81,10 @@ if __name__ == "__main__":
         default = 10,
         type = int,
         help = "Amount of time between data refreshes"
+    )
+    parser.add_argument(
+        "--hostname",
+        default = gethostname(),
+        help = "The hostname to send to the upstream server"
     )
     ism_mainloop(parser.parse_args())

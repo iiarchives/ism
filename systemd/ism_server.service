@@ -7,7 +7,8 @@ Wants=network-online.target
 Type=simple
 User=ism
 Group=ism
-ExecStart=python3 ism_server.py --host 0.0.0.0 --port 8335
+ExecStart=python3 -m uvicorn ism_server:app --host 0.0.0.0 --port 8335 --ssl-keyfile=/opt/ism/server/cert/key.pem --ssl-certfile=/opt/ism/server/cert/cert.pem
+Environment="ACCESS_TOKEN=5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
 WorkingDirectory=/opt/ism/server
 
 [Install]

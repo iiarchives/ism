@@ -19,6 +19,7 @@ init_setup() {
         useradd -M -K MAIL_DIR=/dev/null ism
         usermod -L ism
     fi
+    chown -R ism:ism /opt/ism
 
     # Download repository
     cd /tmp/ism && wget https://github.com/iiPythonx/ism/archive/refs/heads/main.zip

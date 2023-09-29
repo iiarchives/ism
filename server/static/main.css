@@ -1,0 +1,59 @@
+@font-face {
+    font-family: "Open Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/static/fonts/open-sans.woff2") format("woff2");
+}
+body {
+    color: #fefefe;
+    background-color: #121212;
+    font-family: "Open Sans", sans-serif;
+}
+form#login {
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 140px;
+    position: absolute;
+    transform: translateX(-50%) translateY(-50%);
+    border-radius: 10px;
+    background-color: #333333;
+    text-align: center;
+}
+form#login div.inline {
+    display: flex;
+    justify-content: center;
+}
+form#login input {
+    color: #fefefe;
+    width: 60%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #fefefe;
+    border-radius: 5px;
+    transition: all ease .3s;
+    outline: none;
+}
+form#login input:hover {
+    cursor: text;
+}
+form#login input:focus {
+    outline: none;
+    border-color: #979797;
+}
+form#login button {
+    color: #fefefe;
+    width: 20%;
+    padding: 10px;
+    margin-left: 10px;
+    background: transparent;
+    border: 1px solid #fefefe;
+    border-radius: 5px;
+    transition: all ease .3s;
+}
+form#login button:hover {
+    cursor: pointer;
+    border-color: #979797;
+    background-color: #222222;
+}

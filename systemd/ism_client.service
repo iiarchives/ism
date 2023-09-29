@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=simple
 User=ism
 Group=ism
-ExecStart=python3 ism_client.py --server 127.0.0.1 --token "abcdefg" --delay 10
+ExecStart=python3 ism_client.py --server 127.0.0.1:8335 --token "abcdefg" --delay 10
 WorkingDirectory=/opt/ism/client
 
 [Install]

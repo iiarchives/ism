@@ -14,7 +14,7 @@ init_setup() {
     rm -rf /tmp/ism  # In case of multiple wizard installs (maybe a crash?)
     mkdir -p /tmp/ism /opt/ism
     if ! id ism >/dev/null 2>&1; then
-        useradd -M ism
+        useradd -M -K MAIL_DIR=/dev/null ism
         usermod -L ism
     fi
 
@@ -32,12 +32,30 @@ init_setup() {
         exit 1
     fi
 
+    # Head to repo
     unzip main.zip
+    cd ism-main
 } 
+clean() {
+    cd && rm -rf /tmp/ism
+}
 install_client() {
     init_setup
-    echo "Installing ISM client ..."
-    ls
+    echo "Installing ISM client requirements ..."
+    python3 -m pip install -r client/requirements.txt
+    echo "Copying ISM client files ..."
+    cp -r client/ /opt/ism/
+    echo "Installing systemd unit ..."
+    cp systemd/ism_client.service /lib/systemd/system/
+    systemctl daemon-reload
+    systemctl enable ism_client
+    echo "Cleaning up ..."
+    clean
+    printf "\n\n\n"
+    echo "ISM client installed!"
+    echo "Now, edit /lib/systemd/system/ism_client.service and add in your configuration details."
+    echo "Afterwards, the client can be started with `systemctl start ism_client`!"
+    exit 0
 }
 install_server() {
     init_setup

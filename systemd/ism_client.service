@@ -1,0 +1,14 @@
+[Unit]
+Description=ISM Client Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ism
+Group=ism
+ExecStart=python3 ism_client.py --server 127.0.0.1 --token "abcdefg" --delay 10
+WorkingDirectory=/opt/ism/client
+
+[Install]
+WantedBy=multi-user.target

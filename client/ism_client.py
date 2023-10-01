@@ -66,7 +66,7 @@ def ism_mainloop(args) -> None:
                 resp = session.post(
                     f"http{'s' if not args.insecure else ''}://{args.server}/api/upload",
                     json = metrics,
-                    verify = True
+                    verify = False
                 )
                 if resp.status_code != 200:
                     logging.warn(resp.json())

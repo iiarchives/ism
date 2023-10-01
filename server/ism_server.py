@@ -57,14 +57,18 @@ def add_token(ip: str, hostname: str, token: str) -> None:
 async def api_upload(request: Request) -> Response:
     data = await request.json()
     if data is None:
-        return bad_request("Missing payload.")
+        return bad_request({"success": False, "error": "Missing payload."})
 
-    correct_token = get_tokens().get(request.client_ip, {"token": None})["token"]
-    if correct_token != (data.get("token") or ""):
-        return unauthorized("Invalid client token.")
+    try:
+        data, auth = data["data"], data["auth"]
+        correct_token = get_tokens()[request.client_ip]["token"]
+        if correct_token != auth["token"]:
+            return unauthorized({"success": False, "error": "Invalid client token."})
 
-    path, logs = data_path / (data["hostname"] + ".json"), []
-    del data["hostname"], data["token"]
+    except (IndexError, KeyError):
+        return json({"success": False, "error": "Invalid request."})
+
+    path, logs = data_path / (auth["hostname"] + ".json"), []
     if path.is_file():
         with open(path, "r") as fh:
             logs = loads(fh.read())

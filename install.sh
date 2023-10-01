@@ -59,6 +59,10 @@ clean() {
 install_client() {
     init_setup
     base_install client
+    read -p "Upstream server: " upstream
+    read -p "Access token: " token
+    sed -i "s/127.0.0.1/$upstream/g" /lib/systemd/system/ism_client.service
+    sed -i "s/abcdefg/$token/g" /lib/systemd/system/ism_client.service
     echo "Cleaning up ..."
     clean
     echo "ISM client installed!"

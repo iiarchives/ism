@@ -2,8 +2,9 @@
 
 # Modules
 import os
+import secrets
 import logging
-from typing import List
+from typing import Dict
 from pathlib import Path
 from hashlib import sha256
 from json import dumps, loads
@@ -39,23 +40,27 @@ data_path = base_dir / "data"
 tokens_file = data_path / "tokens.json"
 os.makedirs(data_path, exist_ok = True)
 
-def get_tokens() -> List[str]:
+def get_tokens() -> Dict[str, Dict[str, str]]:
     if not tokens_file.is_file():
-        return []
+        return {}
 
     with open(tokens_file, "r") as fh:
         return loads(fh.read())
 
-def add_token(token: str) -> None:
+def add_token(ip: str, hostname: str, token: str) -> None:
     tokens = get_tokens()
-    tokens.append(token)
+    tokens[ip] = {"hostname": hostname, "token": token}
     with open(tokens_file, "w+") as fh:
         fh.write(dumps(tokens))
 
 @app.route("/api/upload", methods = ["POST"])
 async def api_upload(request: Request) -> Response:
     data = await request.json()
-    if data.get("token") not in get_tokens():
+    if data is None:
+        return bad_request("Missing payload.")
+
+    correct_token = get_tokens().get(request.client_ip, {"token": None})["token"]
+    if correct_token != (data.get("token") or ""):
         return unauthorized("Invalid client token.")
 
     path, logs = data_path / (data["hostname"] + ".json"), []
@@ -69,6 +74,22 @@ async def api_upload(request: Request) -> Response:
         fh.write(dumps(logs[-144:]))
 
     return json({"success": True})
+
+@app.route("/api/add", methods = ["POST"])
+async def api_add(request: Request) -> Response:
+    if "logged_in" not in request.session:
+        return json({"success": False, "error": "You are not logged in."})
+
+    data = await request.json()
+    if data is None:
+        return json({"success": False, "error": "Missing payload."})
+
+    elif not all([data.get("hostname", "").strip(), data.get("ip", "").strip()]):
+        return json({"success": False, "error": "Parameters cannot be empty."})
+
+    token = secrets.token_hex(16)
+    add_token(data["ip"], data["hostname"], token)
+    return json({"success": True, "token": token})
 
 @app.route("/api/logs", methods = ["GET"])
 async def api_logs(request: Request) -> Response:

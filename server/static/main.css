@@ -57,3 +57,77 @@ form#login button:hover {
     border-color: #979797;
     background-color: #222222;
 }
+div#container {
+    /*background-color: #fefefe;*/
+    left: 50%;
+    width: 650px;
+    margin-top: 40px;
+    position: absolute;
+    transform: translateX(-50%);
+}
+div#server_select {
+    display: flex;
+    margin-bottom: 10px;
+    justify-content: center;
+}
+button.server {
+    color: #fefefe;
+    border: 2px solid #fefefe;
+    padding: 10px;
+    margin: 10px;
+    background: none;
+    transition: border-color ease .3s;
+}
+button.server:hover {
+    cursor: pointer;
+    border: 2px solid #979797;
+}
+button#add_server {
+    display: none;
+}
+div#instructions {
+    display: none;
+    top: 50%;
+    left: 50%;
+    padding: 20px;
+    border: 2px solid #fefefe;
+    position: absolute;
+    transform: translateX(-50%) translateY(-50%);
+    width: fit-content;
+    height: fit-content;
+    z-index: 999;
+    background-color: #000;
+    box-shadow: 20px 20px 5px #222;
+}
+div#instructions h2 {
+    margin: 0px;
+    margin-bottom: 5px;
+}
+code {
+    color: #e0ce05;
+    padding: 5px;
+}
+
+/* Loading spinner */
+#spinner {
+    display: inline-block;
+    border: none;
+    width: fit-content;
+    height: fit-content;
+    margin-bottom: 20px;
+}
+#spinner:after {
+    content: " ";
+    display: block;
+    width: 22px;
+    height: 22px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: loading 1.2s linear infinite;
+}
+@keyframes loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

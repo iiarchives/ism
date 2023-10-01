@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% set title = "Dashboard" %}
+{% block content %}
+    <div id = "instructions">
+        <h3>Setup instructions</h3>
+        <hr>
+        <ol>
+            <li>Install ISM: <code>sudo sh -c "$(curl -L https://s.iipython.dev/S)"</code></li>
+            <li>Select the <code>Install Client</code> option</li>
+            <li>The access token is <code id = "access_token"></code></li>
+            <li>Reload the page to see the new host</li>
+        </ol>
+    </div>
+    <div id = "container">
+        <div id = "server_select">
+            <div id = "spinner"></div>
+            <button class = "server" id = "add_server">+ add</button>
+        </div>
+        <hr>
+        <div id = "server_graphs">
+            <p>No server selected.</p>
+            <canvas id = "cpu_stats"></canvas>
+            <canvas id = "mem_stats"></canvas>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script type = "text/javascript">
+
+        // UI references
+        const cpu_stats = document.getElementById("cpu_stats");
+        const mem_stats = document.getElementById("mem_stats");
+        const add_server = document.getElementById("add_server");
+        const server_select = document.getElementById("server_select");
+        const server_graphs = document.getElementById("server_graphs");
+
+        // Handle adding a server
+        add_server.addEventListener("click", async () => {
+            const hostname = prompt("Hostname:");
+            if (!hostname.length) return;
+            const ip = prompt("IP address of host (access control):");
+            if (!ip.length) return;
+            
+            // Create host
+            const resp = await fetch("/api/add", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({"hostname": hostname, "ip": ip})
+            });
+            const result = await resp.json();
+            if (!result.success) return alert(result.error);
+            document.getElementById("access_token").innerText = result.token;
+            document.getElementById("instructions").style.display = "block";
+        });
+
+        // Handle button processing
+        function add_host(hostname) {
+            const button = document.createElement("button");
+            button.innerText = hostname;
+            button.classList.push("server");
+            server_select.appendChild(button)
+
+            // Handle selecting host
+            button.addEventListener("click", () => {
+                console.log(hostname);
+            });
+        }
+
+        // Load all log information
+        (async () => {
+            const log_data = await (await fetch("/api/logs")).json();
+            window.log_data = log_data;
+            for (let i in log_data) add_host(i);
+            add_server.style.display = "block";
+            document.getElementById("spinner").remove();
+        })();
+    </script>
+{% endblock %}

@@ -46,7 +46,7 @@ def ism_mainloop(args) -> None:
             # Send off to remote upstream
             try:
                 resp = session.post(
-                    f"https://{args.server}/api/upload",
+                    f"http{'s' if not args.insecure else ''}://{args.server}/api/upload",
                     json = metrics,
                     verify = False  # Most people won't have a certificate for this
                 )
@@ -86,5 +86,10 @@ if __name__ == "__main__":
         "--hostname",
         default = gethostname(),
         help = "The hostname to send to the upstream server"
+    )
+    parser.add_argument(
+        "--insecure",
+        help = "Use HTTP instead of HTTPS (unrecommended)",
+        action = "store_true"
     )
     ism_mainloop(parser.parse_args())

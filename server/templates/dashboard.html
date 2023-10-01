@@ -25,6 +25,7 @@
     </div>
 
     <!-- JS -->
+    <script src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script type = "text/javascript">
 
         // UI references
@@ -60,12 +61,59 @@
         function add_host(hostname) {
             const button = document.createElement("button");
             button.innerText = hostname;
-            button.classList.push("server");
-            server_select.appendChild(button)
+            button.classList = "server";
+            server_select.insertBefore(button, add_server);
 
             // Handle selecting host
             button.addEventListener("click", () => {
-                console.log(hostname);
+                function create_chart(elem, title, times, data, suffix, max) {
+                    return new Chart(elem, {
+                        type: "line",
+                        data: {
+                            labels: times,
+                            datasets: data
+                        },
+                        options: {
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: (c) => { return c.parsed.y + suffix; }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${title} (${hostname})`
+                                }
+                            },
+                            scales: {
+                                x: { display: false },
+                                y: {
+                                    suggestedMax: max,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: (v) => { return v + suffix; }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                server_graphs.removeChild(server_graphs.firstElementChild);
+                if (window.charts) for (let c of window.charts) c.destroy();
+                let cpu_data = [], mem_data = [{ label: "RAM Usage", data: [] }], total_mem = 0, times = [];
+                for (let entry of window.log_data[hostname]) {
+                    for (let cpu in entry.cpu) {
+                        if (!cpu_data[cpu]) cpu_data.push({ label: `CPU ${Number(cpu) + 1}`, data: [] });
+                        cpu_data[cpu].data.push(entry.cpu[cpu]);
+                    }
+                    total_mem = entry.ram.total;
+                    mem_data[0].data.push(entry.ram.used);
+                    times.push((new Date(entry.time * 1000)).toLocaleString());
+                }
+                window.charts = [
+                    create_chart(cpu_stats, "CPU Usage", times, cpu_data, "%", 100),
+                    create_chart(mem_stats, "RAM Usage", times, mem_data, "GB", total_mem)
+                ];
             });
         }
 

@@ -24,18 +24,15 @@ init_setup() {
     # Download repository
     cd /tmp/ism && wget https://github.com/iiPythonx/ism/archive/refs/heads/main.zip
 
-    # Install unzip
-    if ! command -v unzip &> /dev/null
-    then
-        echo "Installing unzip ..."
-        if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache unzip
-        elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install unzip -y
-        elif [ -x "$(command -v dnf)" ];     then sudo dnf install unzip -y
-        elif [ -x "$(command -v zypper)" ];  then sudo zypper install unzip
-        else
-            echo "FAILED TO INSTALL the unzip package, please install it manually and restart the installation.">&2
-            exit 1
-        fi
+    # Install dependencies
+    echo "Installing package dependencies ..."
+    if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache unzip python3-dev python3-pip
+    elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install unzip python3-dev python3-pip -y
+    elif [ -x "$(command -v dnf)" ];     then sudo dnf install unzip python3-devel python3-pip -y
+    elif [ -x "$(command -v zypper)" ];  then sudo zypper install unzip python3-dev python3-pip
+    else
+        echo "FAILED TO INSTALL: unzip python3-dev python3-pip, please install them manually and restart the installation.">&2
+        exit 1
     fi
 
     # Head to repo

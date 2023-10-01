@@ -18,7 +18,7 @@
         </div>
         <hr>
         <div id = "server_graphs">
-            <p>No server selected.</p>
+            <p id = "no_server">No server selected.</p>
             <canvas id = "cpu_stats"></canvas>
             <canvas id = "mem_stats"></canvas>
         </div>
@@ -98,8 +98,9 @@
                         }
                     });
                 }
-                server_graphs.removeChild(server_graphs.firstElementChild);
-                if (window.charts) for (let c of window.charts) c.destroy();
+                const no_server = document.getElementById("no_server");
+                if (no_server) no_server.remove();
+                for (let c of (window.charts || [])) c.destroy();
                 let cpu_data = [], mem_data = [{ label: "RAM Usage", data: [] }], total_mem = 0, times = [];
                 for (let entry of window.log_data[hostname]) {
                     for (let cpu in entry.cpu) {

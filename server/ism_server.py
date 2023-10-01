@@ -75,7 +75,7 @@ async def api_upload(request: Request) -> Response:
 
     logs.append(data)
     with open(path, "w+") as fh:
-        fh.write(dumps(logs[-144:]))
+        fh.write(dumps(logs[-4320:]))
 
     return json({"success": True})
 

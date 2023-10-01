@@ -103,6 +103,9 @@ div#instructions h2 {
     margin: 0px;
     margin-bottom: 5px;
 }
+div#server_graphs:last-child {
+    margin-bottom: 60px;
+}
 code {
     color: #e0ce05;
     padding: 5px;

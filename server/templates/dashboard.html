@@ -21,6 +21,7 @@
             <p id = "no_server">No server selected.</p>
             <canvas id = "cpu_stats"></canvas>
             <canvas id = "mem_stats"></canvas>
+            <canvas id = "net_stats"></canvas>
         </div>
     </div>
 
@@ -31,6 +32,7 @@
         // UI references
         const cpu_stats = document.getElementById("cpu_stats");
         const mem_stats = document.getElementById("mem_stats");
+        const net_stats = document.getElementById("net_stats");
         const add_server = document.getElementById("add_server");
         const server_select = document.getElementById("server_select");
         const server_graphs = document.getElementById("server_graphs");
@@ -101,7 +103,9 @@
                 const no_server = document.getElementById("no_server");
                 if (no_server) no_server.remove();
                 for (let c of (window.charts || [])) c.destroy();
-                let cpu_data = [], mem_data = [{ label: "RAM Usage", data: [] }], total_mem = 0, times = [];
+                let cpu_data = [], mem_data = [{ label: "RAM Usage", data: [] }],
+                    net_data = [{ label: "Network Usage (in)", data: [] }, { label: "Network Usage (out)", data: [] }],
+                    total_mem = 0, times = [];
                 for (let entry of window.log_data[hostname]) {
                     for (let cpu in entry.cpu) {
                         if (!cpu_data[cpu]) cpu_data.push({ label: `CPU ${Number(cpu) + 1}`, data: [] });
@@ -109,11 +113,14 @@
                     }
                     total_mem = entry.ram.total;
                     mem_data[0].data.push(entry.ram.used);
+                    net_data[0].data.push(entry.net.in);
+                    net_data[1].data.push(entry.net.out);
                     times.push((new Date(entry.time * 1000)).toLocaleString());
                 }
                 window.charts = [
                     create_chart(cpu_stats, "CPU Usage", times, cpu_data, "%", 100),
-                    create_chart(mem_stats, "RAM Usage", times, mem_data, "GB", total_mem)
+                    create_chart(mem_stats, "RAM Usage", times, mem_data, "GB", total_mem),
+                    create_chart(net_stats, "Network Usage", times, net_data, "MB/s", 1000)
                 ];
             });
         }

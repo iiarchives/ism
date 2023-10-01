@@ -60,10 +60,11 @@ install_client() {
     read -p "Access token: " token
     sed -i "s/127.0.0.1/$upstream/g" /lib/systemd/system/ism_client.service
     sed -i "s/abcdefg/$token/g" /lib/systemd/system/ism_client.service
+    systemctl daemon-reload
     echo "Cleaning up ..."
     clean
     echo "ISM client installed!"
-    echo "Now, edit /lib/systemd/system/ism_client.service and add in your configuration details."
+    echo "Now, edit /lib/systemd/system/ism_client.service and add in any additional options."
     echo "Afterwards, the client can be started with 'systemctl start ism_client'!"
 }
 install_server() {
